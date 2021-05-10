@@ -24,10 +24,10 @@ git submodule update --init -- REPO-NAME
 ```
 
 The submodules are
-https://github.com/glfw/glfw
-https://github.com/g-truc/glm.git
-https://github.com/nothings/stb.git
-https://github.com/unittest-cpp/unittest-cpp.git
+* https://github.com/glfw/glfw
+* https://github.com/g-truc/glm.git
+* https://github.com/nothings/stb.git
+* https://github.com/unittest-cpp/unittest-cpp.git
 
 ### GLAD
 
