@@ -5,6 +5,14 @@
 #include "Texture.h"
 #include "Mesh.h"
 
+#include "glad.h"
+
+#if defined(__WIN32__)
+#include <GL/gl.h>
+#elif defined(__APPLE__)
+#include <gl.h>
+#endif
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -108,6 +116,7 @@ private:
     }
 
     void prepareTexture(std::shared_ptr<Texture> texture) {
+
         glActiveTexture(GL_TEXTURE0);
 
         GLuint textureId;
@@ -166,7 +175,9 @@ private:
 
     void compileShader(std::uint32_t shader, std::string shaderSource) {
 
-        glShaderSource(shader, 1, (const char **) (&shaderSource), nullptr);
+        const char *source = shaderSource.c_str();
+        glShaderSource(shader, 1, &source, nullptr);
+
         glCompileShader(shader);
 
         int success;

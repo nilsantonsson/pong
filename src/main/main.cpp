@@ -1,7 +1,7 @@
 #include "Effect.h"
 #include "Renderer.h"
 #include "Window.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 #include <GLFW/glfw3.h>
 
@@ -54,10 +54,10 @@ enum class PaddleAiState {
 
 const std::uint32_t WINDOW_WIDTH = 1280;
 const std::uint32_t WINDOW_HEIGHT = 720;
-const float PADDLE_SPEED = 300.0;
-const float SIGHT_DISTANCE = 400.0;
-const float BALL_SPEED = 500.0;
+const float SIGHT_DISTANCE = 350.0;
 const float SURFACE_DISTANCE = 4.0;
+const float PADDLE_SPEED = 300.0;
+const float BALL_SPEED = 400.0;
 const float LIMIT_X = 600.0;
 const float LIMIT_Y = 300.0;
 const float DISTANCE_TO_IDLE_Y = 30.0;
@@ -85,7 +85,7 @@ std::uint8_t pointsLeft = 0;
 std::uint8_t pointsRight = 0;
 bool hasUi = false;
 
-Random random;
+Randomizer randomizer;
 PaddleAiState paddleAiState = PaddleAiState::Idle;
 std::map<char, std::shared_ptr<Texture>> mapCharToTexture;
 
@@ -153,7 +153,7 @@ void createBall() {
     ball = std::make_shared<Ball>(
         std::make_shared<Body>(glm::vec2(0.0, 0.0), 10.0f, 10.0f),
         ballMesh);
-    ball->direction = random.randomDirection();
+    ball->direction = randomizer.randomDirection();
 }
 
 void createPaddles() {
@@ -280,7 +280,7 @@ void updateBall(double frameTime) {
         }
 
         ball->body->position = glm::vec2();
-        ball->direction = random.randomDirection();
+        ball->direction = randomizer.randomDirection();
     }
 
     ball->mesh->transform = createTranslation(ball->body->position);
@@ -382,11 +382,11 @@ int main() {
 
     while (!window->shouldClose()) {
 
-        auto newTime = std::chrono::high_resolution_clock::now();
+        auto newTime = std::chrono::steady_clock::now();
         std::chrono::duration<double> frameTime = newTime - currentTime;
         currentTime = newTime;
-
         updateGame(frameTime.count());
+
         window->update();
     }
 

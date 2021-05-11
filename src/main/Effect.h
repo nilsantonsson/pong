@@ -3,9 +3,6 @@
 
 #include "EffectParameter.h"
 
-#include "glad.h"
-#include <GL/gl.h>
-
 #include <cstdint>
 #include <iostream>
 #include <memory>
@@ -23,7 +20,7 @@ struct Effect {
 std::shared_ptr<Effect> buildOrthoEffect() {
     auto effect = std::make_shared<Effect>();
 
-    effect->vertexShaderSource =
+    effect->vertexShaderSource = std::string(
         "#version 330 core\n"
 
         "uniform mat4 model;"
@@ -38,9 +35,9 @@ std::shared_ptr<Effect> buildOrthoEffect() {
         "  	vec4 v0 = model * vertexPosition;"
         "   gl_Position = projection * v0;"
         "   uv = vertexTexCoord;"
-        "}";
+        "}");
 
-    effect->fragmentShaderSource =
+    effect->fragmentShaderSource = std::string(
         "#version 330 core\n"
 
         "uniform sampler2D tex;"
@@ -52,7 +49,7 @@ std::shared_ptr<Effect> buildOrthoEffect() {
         "void main() {"
         "   vec4 temp = texture(tex, vec2(uv.x, 1.0 - uv.y));"
         "   result = vec4(temp.r);"
-        "}";
+        "}");
 
     EffectParameter epProjection {"projection"};
     effect->effectParameters.push_back(epProjection);

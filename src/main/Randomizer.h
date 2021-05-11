@@ -1,5 +1,5 @@
-#ifndef PONG_RANDOM_H
-#define PONG_RANDOM_H
+#ifndef PONG_RANDOMIZER_H
+#define PONG_RANDOMIZER_H
 
 #include <glm/glm.hpp>
 
@@ -7,7 +7,7 @@
 #include <ctime>
 #include <random>
 
-class Random {
+class Randomizer {
 public:
     glm::vec2 randomDirection() {
         return glm::normalize(glm::vec2(
@@ -32,4 +32,4 @@ private:
     std::uniform_real_distribution<float> floatDistro{0.0, 1.0};
 };
 
-#endif // PONG_RANDOM_H
+#endif // PONG_RANDOMIZER_H

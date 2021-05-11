@@ -6,7 +6,7 @@ Move left paddle up and down using W and S or Up and Down arrows.
 Computer controls the right paddle.
 Escape to quit.
 
-![alt text](https://github.com/nilsantonsson/pong/blob/main/screenshot.png?raw=true)
+<img src="screenshot.png" width="507" height="300">
 
 ## Prerequisities
 

@@ -3,9 +3,7 @@
 
 #include "Effect.h"
 #include "Texture.h"
-#include "glad.h"
 
-#include <GL/gl.h>
 #include <glm/glm.hpp>
 
 #include <cstdint>

@@ -17,10 +17,20 @@ public:
             exit(EXIT_FAILURE);
         }
 
+#if defined(__WIN32__)
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#elif defined(__APPLE__)
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#endif
+    
         glfwWindowHint(GLFW_DEPTH_BITS, 16);
+        glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 
         glfwWindow = glfwCreateWindow(width, height, "pong", nullptr, nullptr);
         if (glfwWindow == nullptr) {

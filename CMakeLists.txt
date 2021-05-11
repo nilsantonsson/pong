@@ -29,20 +29,20 @@ include_directories(stb)
 include_directories(glfw/include)
 include_directories(unittest-cpp/UnitTest++)
 
+file(GLOB PONG_APP_SOURCES
+    "src/main/*.cpp"
+    "src/main/glad/*.c"
+)
+
+file(GLOB TEST_SOURCES
+    "src/main/glad/*.c"
+    "src/test/*.cpp"
+)
+
+link_directories(build/glfw/src)
+link_directories(build/unittest-cpp)
+
 if (WIN32)
-
-    file(GLOB PONG_APP_SOURCES
-        "src/main/*.cpp"
-        "src/main/glad/*.c"
-    )
-
-    file(GLOB TEST_SOURCES
-        "src/main/glad/*.c"
-        "src/test/*.cpp"
-    )
-
-    link_directories(build/glfw/src)
-    link_directories(build/unittest-cpp)
 
     set(PROJECT_LINK_LIBS
         libglfw3.a
@@ -57,4 +57,37 @@ if (WIN32)
     add_executable(pong-test ${TEST_SOURCES})
     target_link_libraries(pong-test ${PROJECT_LINK_LIBS})
 
+elseif (APPLE)
+
+    include_directories(${OPENGL_INCLUDE_DIR}/Headers)
+
+    set(PROJECT_LINK_LIBS
+        libglfw3.a
+        libUnitTest++.a
+    )
+
+    add_executable(pong-app ${PONG_APP_SOURCES})
+    target_link_libraries(pong-app ${PROJECT_LINK_LIBS})
+
+    add_executable(pong-test ${TEST_SOURCES})
+    target_link_libraries(pong-test ${PROJECT_LINK_LIBS})
+
+    target_link_libraries(pong-app
+        "-framework OpenGL"
+        "-framework IOKit"
+        "-framework Cocoa"
+        "-framework System"
+    )
+else ()
+    set(PROJECT_LINK_LIBS
+        libglfw3.a
+        libUnitTest++.a
+        OpenGL::GL
+    )
+
+    add_executable(pong-app ${PONG_APP_SOURCES})
+    target_link_libraries(pong-app ${PROJECT_LINK_LIBS})
+
+    add_executable(pong-test ${TEST_SOURCES})
+    target_link_libraries(pong-test ${PROJECT_LINK_LIBS})    
 endif ()
