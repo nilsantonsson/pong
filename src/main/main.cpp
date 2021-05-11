@@ -88,6 +88,7 @@ bool hasUi = false;
 Randomizer randomizer;
 PaddleAiState paddleAiState = PaddleAiState::Idle;
 std::map<char, std::shared_ptr<Texture>> mapCharToTexture;
+auto currentTime = std::chrono::high_resolution_clock::now();
 
 char indexToChar(int index) {
     return index + 48;
@@ -372,7 +373,6 @@ void updateGame(double frameTime) {
     renderer->render();
 }
 
-auto currentTime = std::chrono::high_resolution_clock::now();
 int main() {
 
     window = std::make_shared<Window>(WINDOW_WIDTH, WINDOW_HEIGHT);

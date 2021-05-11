@@ -2,7 +2,7 @@
 
 It's Pong. No further explanation needed.
 
-Move left paddle up and down using W and S or Up and Down arrows.
+Move left paddle up and down using W/S or Up/Down keys.
 Computer controls the right paddle.
 Escape to quit.
 
@@ -15,12 +15,12 @@ Escape to quit.
 
 ## Dependencies
 
-Submodules have been added by calling
+Submodules have been added by running
 ```sh
 git submodule add REPO-URL
 ```
 
-To update submodule, call
+To update submodule, run
 ```sh
 git submodule update --init -- REPO-NAME
 ```
@@ -50,6 +50,7 @@ make
 If running with MSYS on Windows appending a generator on the cmake call is recommended.
 
 ```sh
+cd build
 cmake .. -G "MSYS Makefiles"
 ```
 

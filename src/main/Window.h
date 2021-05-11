@@ -31,6 +31,7 @@ public:
     
         glfwWindowHint(GLFW_DEPTH_BITS, 16);
         glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
         glfwWindow = glfwCreateWindow(width, height, "pong", nullptr, nullptr);
         if (glfwWindow == nullptr) {
