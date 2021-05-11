@@ -9,6 +9,7 @@
 #include "stb_truetype.h"
 
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -53,9 +54,9 @@ enum class PaddleAiState {
 
 const std::uint32_t WINDOW_WIDTH = 1280;
 const std::uint32_t WINDOW_HEIGHT = 720;
-const float PADDLE_SPEED = 3.0;
+const float PADDLE_SPEED = 300.0;
 const float SIGHT_DISTANCE = 400.0;
-const float BALL_SPEED = 5.0;
+const float BALL_SPEED = 500.0;
 const float SURFACE_DISTANCE = 4.0;
 const float LIMIT_X = 600.0;
 const float LIMIT_Y = 300.0;
@@ -251,7 +252,7 @@ bool overlaps(std::shared_ptr<Body> bodyA, std::shared_ptr<Body> bodyB) {
         (aabbMin0.y <= aabbMax1.y && aabbMax0.y >= aabbMin1.y);
 }
 
-void updateBall() {
+void updateBall(double frameTime) {
 
     for (auto obstacle : obstacles) {
         if (overlaps(ball->body, obstacle->body)) {
@@ -266,7 +267,7 @@ void updateBall() {
         }
     }
 
-    ball->body->position += (ball->direction * BALL_SPEED);
+    ball->body->position += (ball->direction * BALL_SPEED * static_cast<float>(frameTime));
     bool missedLeft = ball->body->position.x < -LIMIT_X;
     bool missedRight = ball->body->position.x > LIMIT_X;
     
@@ -294,13 +295,13 @@ void updatePaddle(std::shared_ptr<Paddle> paddle, glm::vec2 velocity) {
     paddle->mesh->transform = createTranslation(cappedPosition);
 }
 
-void updateLeftPaddle() {
+void updateLeftPaddle(double frameTime) {
     float velocityY = 0.0;
     if (movingUp) {
-        velocityY += PADDLE_SPEED;
+        velocityY += PADDLE_SPEED * frameTime;
     }
     if (movingDown) {
-        velocityY -= PADDLE_SPEED;
+        velocityY -= PADDLE_SPEED * frameTime;
     }
 
     updatePaddle(paddleLeft, glm::vec2(0.0, velocityY));
@@ -310,7 +311,7 @@ bool ballIsInSight() {
     return std::abs(ball->body->position.x - paddleRight->body->position.x) < SIGHT_DISTANCE;
 }
 
-void updateRightPaddle() {
+void updateRightPaddle(double frameTime) {
 
     float velocityY = 0.0;
 
@@ -325,9 +326,9 @@ void updateRightPaddle() {
         case PaddleAiState::CatchingBall :
             if (ballIsInSight() && ball->direction.x > 0.0) {
                 if (ball->body->position.y - paddleRight->body->position.y > BALL_PADDLE_DIFF_Y) {
-                    velocityY = PADDLE_SPEED;
+                    velocityY = PADDLE_SPEED * frameTime;
                 } else if (ball->body->position.y - paddleRight->body->position.y < -BALL_PADDLE_DIFF_Y) {
-                    velocityY = -PADDLE_SPEED;
+                    velocityY = -PADDLE_SPEED * frameTime;
                 }
 
             } else {
@@ -337,10 +338,10 @@ void updateRightPaddle() {
 
         case PaddleAiState::GoingToIdle :
             if (paddleRight->body->position.y > DISTANCE_TO_IDLE_Y) {
-                velocityY = -PADDLE_SPEED;
+                velocityY = -PADDLE_SPEED * frameTime;
 
             } else if (paddleRight->body->position.y < -DISTANCE_TO_IDLE_Y) {
-                velocityY = PADDLE_SPEED;
+                velocityY = PADDLE_SPEED * frameTime;
 
             } else {
                 paddleAiState = PaddleAiState::Idle;
@@ -361,16 +362,17 @@ void updateUi() {
     }
 }
 
-void updateGame() {
+void updateGame(double frameTime) {
 
-    updateBall();
-    updateLeftPaddle();
-    updateRightPaddle();
+    updateBall(frameTime);
+    updateLeftPaddle(frameTime);
+    updateRightPaddle(frameTime);
     updateUi();
 
     renderer->render();
 }
 
+auto currentTime = std::chrono::high_resolution_clock::now();
 int main() {
 
     window = std::make_shared<Window>(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -379,7 +381,12 @@ int main() {
     setupGame();
 
     while (!window->shouldClose()) {
-        updateGame();
+
+        auto newTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> frameTime = newTime - currentTime;
+        currentTime = newTime;
+
+        updateGame(frameTime.count());
         window->update();
     }
 
