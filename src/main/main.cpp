@@ -382,7 +382,7 @@ int main() {
 
     while (!window->shouldClose()) {
 
-        auto newTime = std::chrono::steady_clock::now();
+        auto newTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> frameTime = newTime - currentTime;
         currentTime = newTime;
         updateGame(frameTime.count());
