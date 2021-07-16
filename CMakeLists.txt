@@ -4,10 +4,11 @@ project (pong-project LANGUAGES CXX C)
 
 find_package(OpenGL REQUIRED)
 
-# Make sure Release build
-if (NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
-endif ()
+# Set default build type
+if (NOT CMAKE_BUILD_TYPE)
+    set( CMAKE_BUILD_TYPE Release CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif (NOT CMAKE_BUILD_TYPE)
 
 # Other compile flags
 set(CMAKE_CXX_STANDARD 17)

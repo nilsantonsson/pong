@@ -1,16 +1,17 @@
+#include "Helper.h"
 #include "Effect.h"
+#include "Mesh.h"
 #include "Renderer.h"
 #include "Window.h"
 #include "Randomizer.h"
+#include "Gui.h"
 
 #include <GLFW/glfw3.h>
-
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <algorithm>
 #include <chrono>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -67,8 +68,6 @@ const float PADDLE_HEIGHT = 50.0;
 std::shared_ptr<Window> window;
 std::shared_ptr<Renderer> renderer;
 std::shared_ptr<Effect> orthoEffect;
-std::shared_ptr<Mesh> pointsLeftMesh;
-std::shared_ptr<Mesh> pointsRightMesh;
 std::uint8_t whitePixel = 255;
 std::shared_ptr<Texture> whiteTexture;
 
@@ -83,16 +82,12 @@ bool movingUp = false;
 bool movingDown = false;
 std::uint8_t pointsLeft = 0;
 std::uint8_t pointsRight = 0;
-bool hasUi = false;
 
 Randomizer randomizer;
 PaddleAiState paddleAiState = PaddleAiState::Idle;
-std::map<char, std::shared_ptr<Texture>> mapCharToTexture;
 auto currentTime = std::chrono::high_resolution_clock::now();
 
-char indexToChar(int index) {
-    return index + 48;
-}
+std::shared_ptr<Gui> gui;
 
 void keyCallback(GLFWwindow* glfwWindow, int key, int scanCode, int action, int mods) {
 
@@ -121,10 +116,6 @@ void keyCallback(GLFWwindow* glfwWindow, int key, int scanCode, int action, int 
             movingDown = false;
         }
     }
-}
-
-glm::mat4 createTranslation(glm::vec2 translation) {
-    return glm::translate(glm::mat4(1.0), glm::vec3(translation, 0.0));
 }
 
 void createWalls() {
@@ -181,49 +172,6 @@ void createPaddles() {
     obstacles.push_back(paddleRight);
 }
 
-std::shared_ptr<Mesh> createTextMesh(glm::vec2 position) {
-    auto textMesh = buildQuadMesh(30.0, 40.0, orthoEffect);
-    textMesh->texture = mapCharToTexture[indexToChar(0)];
-    textMesh->transform = createTranslation(position);
-    renderer->addMesh(textMesh);
-    return textMesh;
-}
-
-void createUi() {
-    std::ifstream ifs("../data/arial.ttf", std::ios::in | std::ios::binary);
-    if (ifs.is_open()) {
-        std::vector<std::uint8_t> ttfBuffer {
-            std::istreambuf_iterator<char>(ifs),
-            std::istreambuf_iterator<char>()
-        };
-
-        stbtt_fontinfo font;
-        stbtt_InitFont(&font, ttfBuffer.data(), stbtt_GetFontOffsetForIndex(ttfBuffer.data(), 0));
-
-        for (std::uint8_t i = 0; i < 10; i++) {
-            float scaleY = stbtt_ScaleForPixelHeight(&font, 120);
-            int imageWidth;
-            int imageHeight;
-            std::uint8_t *imageData = stbtt_GetCodepointBitmap(&font, 10, scaleY, indexToChar(i), &imageWidth, &imageHeight, 0, 0);
-
-            auto image = std::make_shared<Image>(imageWidth, imageHeight, imageData);
-            auto texture = std::make_shared<Texture>(image);
-            mapCharToTexture[indexToChar(i)] = texture;
-            renderer->addTexture(texture);
-        }
-
-        pointsLeftMesh = createTextMesh(glm::vec2(-100.0, -310.0));
-        pointsRightMesh = createTextMesh(glm::vec2(100.0, -310.0));
-
-        hasUi = true;
-
-        ifs.close();
-
-    } else {
-        std::cerr << "Font file not found\n";
-    }
-}
-
 void setupGame() {
 
     renderer = std::make_shared<Renderer>(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -235,7 +183,8 @@ void setupGame() {
     createWalls();
     createBall();
     createPaddles();
-    createUi();
+
+    gui = std::make_shared<Gui>(renderer, orthoEffect);
 
     renderer->prepare();
 }
@@ -356,19 +305,13 @@ void updateRightPaddle(double frameTime) {
     updatePaddle(paddleRight, glm::vec2(0.0, velocityY));
 }
 
-void updateUi() {
-    if (hasUi) {
-        pointsLeftMesh->texture = mapCharToTexture[indexToChar(pointsLeft)];
-        pointsRightMesh->texture = mapCharToTexture[indexToChar(pointsRight)];
-    }
-}
-
 void updateGame(double frameTime) {
 
     updateBall(frameTime);
     updateLeftPaddle(frameTime);
     updateRightPaddle(frameTime);
-    updateUi();
+
+    gui->update(pointsLeft, pointsRight);
 
     renderer->render();
 }
