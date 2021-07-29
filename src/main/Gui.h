@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <fstream>
+#include <map>
 #include <vector>
 
 class Gui {
